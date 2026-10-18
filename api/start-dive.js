@@ -94,7 +94,7 @@ existing prompts. Never duplicate or closely paraphrase an existing prompt.
 4. CRITICAL: NEVER repeat or closely rephrase ANY of these previously used prompts: [${exclusionList || 'None yet'}]`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash-lite',
+      model: 'gemini-3.8-flash',
       contents: systemPrompt,
       config: {
         temperature: 1.1,
