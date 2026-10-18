@@ -23,12 +23,74 @@ export default async function handler(req, res) {
     );
     const exclusionList = previousPrompts.slice(-300).join(' | ');
 
-    const systemPrompt = `You are the game designer for "Abyssal Trivia", a deep-sea rarity word game based on the Krillion scales.
-Generate 12 creative, open-ended category prompts for a new dive.
-Rules for prompts:
-1. Each prompt must have at least 30+ possible factual or universally verifiable answers.
-2. Vary the topics across geography, science, animals, food, language, pop culture, sports, inventions, and history.
-3. Keep prompts concise and punchy (under 12 words).
+    const systemPrompt = `You generate prompts for a daily trivia game where players type ONE answer
+per prompt and score more for rarer (but still valid) answers. The obvious
+answer earns almost nothing; deep, obscure, correct answers earn the most.
+
+WHAT MAKES A GOOD PROMPT
+- Open-ended: it has a large pool of valid answers (aim for 50-300), so
+  there is a clear "everyone says this" answer AND a long tail of obscure
+  ones.
+- Objectively checkable: whether an answer is valid is a matter of fact,
+  not opinion. A neutral person with a search engine could verify any
+  answer in under a minute.
+- Short and unambiguous: one sentence, usually in the form "Name a ___"
+  or "Name something that ___". No tricks, no wordplay, no multi-part
+  conditions.
+- Timeless: avoid anything tied to current events, prices, rankings, or
+  records that change.
+- Answerable in about 20 seconds by a casual player who knows a little
+  about the topic.
+- Broad appeal and globally fair: don't assume knowledge of one country's
+  culture unless the prompt says so.
+
+GOOD EXAMPLES OF THE SHAPE (do not reuse these)
+- "Name a country that is landlocked."
+- "Name a chemical element named after a place."
+- "Name a musical instrument that uses a reed."
+- "Name an animal with stripes."
+
+AVOID
+- Prompts with only 5-15 valid answers (too small, no long tail).
+- Prompts where one answer overwhelmingly dominates and nothing else
+  plausible exists.
+- Subjective prompts ("Name a good movie", "Name a scary animal").
+- Prompts whose valid answers are mostly spelling or naming variants of
+  the same thing.
+- Trivia with a single correct answer ("What is the capital of France?").
+- Offensive, sexual, or politically charged topics.
+- Anything that could be answered by a proper noun with many aliases
+  unless you list the aliases.
+
+CATEGORIES
+Rotate across: geography, science, nature, food, history, music, movies &
+TV, sports, language, everyday objects, mythology, technology. Never
+produce more than two prompts in a row from the same category.
+
+OUTPUT FORMAT
+Return ONLY valid JSON, no preamble and no markdown fences:
+{
+  "prompts": [
+    {
+      "prompt": "Name a ...",
+      "category": "...",
+      "estimated_valid_answers": <integer>,
+      "common_answers": ["3-5 answers most players will give"],
+      "mid_answers": ["3-5 answers a decent player might find"],
+      "rare_answers": ["3-5 genuinely obscure but valid answers"],
+      "accepted_variants_note": "spelling/alias/plural issues the answer matcher should handle",
+      "difficulty": 1-5
+    }
+  ]
+}
+
+RULES FOR THE EXAMPLE ANSWERS
+- Every listed answer must be definitely valid. If you are not sure an
+  answer qualifies, leave it out.
+- rare_answers must be real and verifiable, not invented.
+
+You will be told how many prompts to generate, and may be given a list of
+existing prompts. Never duplicate or closely paraphrase an existing prompt.
 4. CRITICAL: NEVER repeat or closely rephrase ANY of these previously used prompts: [${exclusionList || 'None yet'}]`;
 
     const response = await ai.models.generateContent({
