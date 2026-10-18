@@ -18,13 +18,12 @@ export default async function handler(req, res) {
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-    // Normalize past prompts for strict duplicate checking
     const seenSet = new Set(
       previousPrompts.map((p) => p.trim().toLowerCase())
     );
     const exclusionList = previousPrompts.slice(-300).join(' | ');
 
-    const systemPrompt = `You are the game designer for "Abyssal Trivia", a deep-sea rarity word game.
+    const systemPrompt = `You are the game designer for "Abyssal Trivia", a deep-sea rarity word game based on the Krillion scales.
 Generate 12 creative, open-ended category prompts for a new dive.
 Rules for prompts:
 1. Each prompt must have at least 30+ possible factual or universally verifiable answers.
@@ -58,7 +57,6 @@ Rules for prompts:
 
     const data = JSON.parse(response.text);
 
-    // Strictly filter out any exact or case-insensitive duplicates
     const uniquePrompts = [];
     for (const rawPrompt of data.prompts || []) {
       const normalized = rawPrompt.trim().toLowerCase();
@@ -68,7 +66,6 @@ Rules for prompts:
       if (uniquePrompts.length === 7) break;
     }
 
-    // Fallback in the rare case filtering left fewer than 7
     while (uniquePrompts.length < 7 && data.prompts?.length) {
       uniquePrompts.push(data.prompts.pop());
     }
