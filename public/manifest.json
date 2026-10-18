@@ -1,0 +1,21 @@
+{
+  "name": "Abyssal Trivia",
+  "short_name": "AbyssalTrivia",
+  "description": "An endless deep-sea rarity word game powered by Google AI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#0284c7",
+  "icons": [
+    {
+      "src": "https://emojicdn.elk.sh/🤿?style=apple",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://emojicdn.elk.sh/🤿?style=apple",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
