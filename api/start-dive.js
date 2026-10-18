@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   }
 
   if (!process.env.GEMINI_API_KEY) {
-    return res.status(500).json({ error: 'Missing GEMINI_API_KEY environment variable.' });
+    return res.status(500).json({ error: 'Server configuration error: GEMINI_API_KEY is missing.' });
   }
 
   try {
@@ -46,10 +46,14 @@ Rules for prompts:
       }
     });
 
+    if (!response || !response.text) {
+      throw new Error('Empty response received from Google AI Studio.');
+    }
+
     const data = JSON.parse(response.text);
     return res.status(200).json(data);
   } catch (error) {
-    console.error('Gemini start-dive error:', error);
-    return res.status(500).json({ error: 'Failed to generate dive prompts from Google AI Studio.' });
+    console.error('Gemini start-dive critical error:', error);
+    return res.status(500).json({ error: `AI Studio Error: ${error.message}` });
   }
 }
