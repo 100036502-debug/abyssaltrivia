@@ -3,18 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Krillian Unlimited 🦐 | Deep-Sea Rarity Trivia</title>
+  <title>Abyssal Trivia 🤿 | Deep-Sea Rarity Game</title>
   <link rel="stylesheet" href="/style.css" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0284c7" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Animated Ocean Background & Bubble Layer -->
   <div id="ocean-bg" class="ocean-bg">
     <div id="bubbles-container" class="bubbles-container"></div>
     <div id="depth-lines" class="depth-lines"></div>
   </div>
 
-  <!-- Left Vertical Depth Track (Visible during Dive) -->
+  <!-- CINEMATIC FULLSCREEN SUBMERSIBLE INTRO SCREEN -->
+  <section id="screen-intro" class="fullscreen-intro hidden">
+    <div class="sub-animation-stage">
+      <div class="large-sub">🤿</div>
+      <div class="dive-beam"></div>
+    </div>
+    <h1 class="cinematic-title">DIVING TO <span id="intro-target-depth">7,000m</span>...</h1>
+    <p id="cinematic-status" class="cinematic-subtitle">Sealing hatch... Pressurizing cabin...</p>
+  </section>
+
   <aside id="depth-sidebar" class="depth-sidebar hidden">
     <div class="depth-track">
       <div class="depth-zone" style="top: 0%">0m <span>Sunlight</span></div>
@@ -29,25 +39,26 @@
     </div>
   </aside>
 
-  <!-- Main Content Container -->
   <main class="app-container">
-    <!-- Header -->
     <header class="game-header">
       <div class="logo-wrap">
-        <span class="logo-icon">🦐</span>
-        <h1>KRILLIAN <span class="badge-unlimited">UNLIMITED</span></h1>
+        <span class="logo-icon">🤿</span>
+        <h1>ABYSSAL <span class="badge-unlimited">TRIVIA</span></h1>
       </div>
-      <div id="hud-stats" class="hud-stats hidden">
-        <div class="stat-pill">Prompt <span id="hud-round">1/7</span></div>
-        <div class="stat-pill depth-pill">Depth: <span id="hud-depth">0</span>m</div>
-        <div class="stat-pill score-pill">Score: <span id="hud-score">0</span></div>
+      <div class="header-right-actions">
+        <button id="install-pwa-btn" class="btn-install hidden" title="Install App">📥 Install App</button>
+        <div id="hud-stats" class="hud-stats hidden">
+          <div class="stat-pill">Prompt <span id="hud-round">1/7</span></div>
+          <div class="stat-pill depth-pill">Depth: <span id="hud-depth">0</span>m</div>
+          <div class="stat-pill score-pill">Score: <span id="hud-score">0</span></div>
+        </div>
       </div>
     </header>
 
-    <!-- SCREEN 1: Password Gate -->
+    <!-- SCREEN: Login -->
     <section id="screen-login" class="card screen">
       <h2>🔒 Classified Trench Access</h2>
-      <p class="subtitle">Enter the vessel authorization password to connect to the sonar array.</p>
+      <p class="subtitle">Enter the vessel password to connect to the sonar array.</p>
       <form id="login-form">
         <input type="password" id="password-input" placeholder="Enter Password..." required autocomplete="off" />
         <button type="submit" id="login-btn" class="btn-primary">Unlock Submersible</button>
@@ -55,61 +66,15 @@
       <p id="login-error" class="error-msg hidden"></p>
     </section>
 
-    <!-- SCREEN 2: Lobby / Scale Legend -->
+    <!-- SCREEN: Lobby -->
     <section id="screen-lobby" class="card screen hidden">
       <h2>Ready to Descend?</h2>
-      <p class="subtitle">7 Prompts. 25 Seconds each. The rarer your answer, the deeper you sink. Every point sinks you 10 meters toward the 7,000m trench floor.</p>
-
-      <div class="tier-grid">
-        <div class="tier-item tier-plankton">
-          <span class="tier-emoji">🫧</span>
-          <div>
-            <strong>Plankton</strong>
-            <small>10 pts · 100m (Obvious first thought)</small>
-          </div>
-        </div>
-        <div class="tier-item tier-tooclever">
-          <span class="tier-emoji">🤡</span>
-          <div>
-            <strong>Too Clever</strong>
-            <small>15 pts · 150m (The overthinker collision trap)</small>
-          </div>
-        </div>
-        <div class="tier-item tier-schooler">
-          <span class="tier-emoji">🐟</span>
-          <div>
-            <strong>Schooler</strong>
-            <small>30 pts · 300m (Solid middling pick)</small>
-          </div>
-        </div>
-        <div class="tier-item tier-rare">
-          <span class="tier-emoji">🦑</span>
-          <div>
-            <strong>Rare</strong>
-            <small>60 pts · 600m (Uncommon knowledge)</small>
-          </div>
-        </div>
-        <div class="tier-item tier-deepcut">
-          <span class="tier-emoji">🏮</span>
-          <div>
-            <strong>Deep Cut</strong>
-            <small>85 pts · 850m (Genuinely obscure)</small>
-          </div>
-        </div>
-        <div class="tier-item tier-krillian">
-          <span class="tier-emoji">🌟</span>
-          <div>
-            <strong>One in a Krillian</strong>
-            <small>100 pts · 1,000m (Almost nobody types it)</small>
-          </div>
-        </div>
-      </div>
-
+      <p class="subtitle">7 Prompts. 25 Seconds of oxygen per prompt. Invalid or wrong answers let you keep guessing instantly without penalty or timer resets!</p>
       <button id="start-dive-btn" class="btn-primary btn-large">🌊 Start New Dive</button>
       <p id="lobby-status" class="status-text hidden">Generating 7 fresh prompts with Google AI Studio...</p>
     </section>
 
-    <!-- SCREEN 3: Active Gameplay -->
+    <!-- SCREEN: Gameplay -->
     <section id="screen-game" class="card screen hidden">
       <div class="timer-bar-container">
         <div id="timer-bar" class="timer-bar"></div>
@@ -123,44 +88,39 @@
 
       <form id="answer-form">
         <input type="text" id="answer-input" placeholder="Type a rare answer..." autocomplete="off" />
-        <button type="submit" id="submit-answer-btn" class="btn-primary">Dive Deeper ⬇️</button>
+        <button type="submit" id="submit-answer-btn" class="btn-primary">Submit Answer ⬇️</button>
       </form>
+      <p id="answer-feedback" class="answer-feedback hidden"></p>
 
-      <!-- Dive Evaluation Overlay / Result Card -->
+      <!-- Round Result Card -->
       <div id="round-result" class="round-result hidden">
         <div id="tier-badge" class="result-tier-badge">🌟 ONE IN A KRILLIAN</div>
-        <div class="result-stats">
-          +<span id="result-points">100</span> pts · Descending <span id="result-meters">1000</span>m
-        </div>
+        <div class="result-stats">+<span id="result-points">100</span> pts · Descending <span id="result-meters">1000</span>m</div>
         <p id="result-comment" class="result-comment"></p>
         <p class="result-alt">💡 <em>1-in-a-Krillian Idea:</em> <span id="result-example"></span></p>
         <button id="next-prompt-btn" class="btn-secondary">Next Depth Prompt ➡️</button>
       </div>
     </section>
 
-    <!-- SCREEN 4: Final Dive Summary -->
+    <!-- SCREEN: Summary -->
     <section id="screen-summary" class="card screen hidden">
       <div class="summary-header">
         <span class="summary-sub-icon">⚓</span>
         <h2>Dive Complete!</h2>
         <p id="final-rank-title" class="final-rank-title">Abyssal Explorer</p>
       </div>
-
       <div class="final-score-box">
         <div class="final-stat">
           <span class="final-label">TOTAL DEPTH REACHED</span>
           <span class="final-value"><span id="final-depth">0</span>m <small>/ 7000m</small></span>
         </div>
         <div class="final-stat">
-          <span class="final-label">OVERALL KRILLIAN SCORE</span>
+          <span class="final-label">OVERALL SCORE</span>
           <span class="final-value"><span id="final-score">0</span> <small>/ 700</small></span>
         </div>
       </div>
-
       <div id="emoji-share-strip" class="emoji-strip"></div>
-
       <div id="summary-log" class="summary-log"></div>
-
       <div class="summary-actions">
         <button id="copy-results-btn" class="btn-secondary">📋 Share Dive Log</button>
         <button id="play-again-btn" class="btn-primary">🔄 Start Another Dive</button>
