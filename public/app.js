@@ -1,6 +1,6 @@
 let userPassword = sessionStorage.getItem('abyssal_pw') || '';
 let prompts = [];
-let previousPrompts = [];
+let previousPrompts = JSON.parse(localStorage.getItem('abyssal_used_prompts') || '[]');
 let currentRound = 0;
 let totalScore = 0;
 let totalDepth = 0;
@@ -143,7 +143,14 @@ async function startNewDive() {
     if (!res.ok) throw new Error(data.error || 'Failed to start dive');
 
     prompts = data.prompts;
+
+    // Save prompts permanently in localStorage so they never repeat across sessions
     previousPrompts.push(...prompts);
+    if (previousPrompts.length > 500) {
+      previousPrompts = previousPrompts.slice(-500);
+    }
+    localStorage.setItem('abyssal_used_prompts', JSON.stringify(previousPrompts));
+
     currentRound = 0;
     totalScore = 0;
     totalDepth = 0;
