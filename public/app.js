@@ -6,7 +6,8 @@ let totalScore = 0;
 let totalDepth = 0;
 let diveHistory = [];
 let timerInterval = null;
-let timeLeft = 25;
+let timeLeft = 25;\
+let isScanning = false;
 
 // DOM Elements
 const screenLogin = document.getElementById('screen-login');
@@ -189,6 +190,7 @@ function loadRound() {
 function startTimer() {
   clearInterval(timerInterval);
   timeLeft = 25;
+  isScanning = false; // <-- Ensure timer starts unpaused
   const timerCount = document.getElementById('timer-count');
   const timerBar = document.getElementById('timer-bar');
 
@@ -196,16 +198,19 @@ function startTimer() {
   timerBar.style.width = '100%';
 
   timerInterval = setInterval(() => {
+    if (isScanning) return; // <-- PAUSES TIMER WHILE SCANNING SONAR!
+
     timeLeft--;
     timerCount.textContent = Math.max(timeLeft, 0);
     timerBar.style.width = `${Math.max((timeLeft / 25) * 100, 0)}%`;
 
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
-      handleTimeout(); // End round when oxygen expires
+      handleTimeout();
     }
   }, 1000);
 }
+
 
 // Handle 0s Oxygen Expiration
 function handleTimeout() {
@@ -257,9 +262,10 @@ async function submitAnswer(answer) {
   const submitBtn = document.getElementById('submit-answer-btn');
   const feedbackEl = document.getElementById('answer-feedback');
 
+  isScanning = true; // <-- 1. PAUSE TIMER HERE (Around Line 232)
   input.disabled = true;
   submitBtn.disabled = true;
-  submitBtn.textContent = 'Scanning Sonar...';
+  submitBtn.textContent = 'Scanning Sonar... (O₂ Paused)';
   feedbackEl.classList.add('hidden');
 
   try {
@@ -276,23 +282,24 @@ async function submitAnswer(answer) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Error judging answer');
 
-    // If timer expired while waiting for API response, let timeout handler take over
     if (timeLeft <= 0) return;
 
-    // Invalid answer: let user keep guessing WITHOUT resetting the timer
+    // Invalid answer: unpause timer and let user keep guessing!
     if (!data.valid || data.tier === 'Invalid') {
+      isScanning = false; // <-- 2. RESUME TIMER HERE (Around Line 255)
       input.disabled = false;
       submitBtn.disabled = false;
       submitBtn.textContent = 'Submit Answer ⬇️';
-      feedbackEl.textContent = `❌ "${answer}" doesn't count (${data.wittyComment || 'Invalid answer'}). Keep guessing—O₂ is still ticking!`;
+      feedbackEl.textContent = `❌ "${answer}" doesn't count (${data.wittyComment || 'Invalid answer'}). Keep guessing—O₂ resumed!`;
       feedbackEl.classList.remove('hidden');
       input.value = '';
       input.focus();
       return;
     }
 
-    // Valid answer locked in: stop timer and descend!
+    // Valid answer locked in: stop timer completely for this round
     clearInterval(timerInterval);
+    isScanning = false;
 
     const startDepth = totalDepth;
     totalScore += data.points;
@@ -329,6 +336,7 @@ async function submitAnswer(answer) {
     nextBtn.textContent = currentRound < 6 ? 'Next Depth Prompt ➡️' : 'Surface & View Final Score ⚓';
     resultBox.classList.remove('hidden');
   } catch (err) {
+    isScanning = false; // <-- 3. RESUME TIMER IF NETWORK ERROR OCCURS (Around Line 302)
     alert(err.message);
     if (timeLeft > 0) {
       input.disabled = false;
