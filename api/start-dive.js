@@ -27,7 +27,7 @@ Rules for prompts:
 4. Avoid repeating any of these recent prompts: ${previousPrompts.slice(-21).join('; ')}`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.8-flash',
       contents: systemPrompt,
       config: {
         temperature: 1.0,
