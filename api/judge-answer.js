@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from '@google/genai';
+import { GoogleGenAI } from '@google/genai';
 
 const TIER_MAP = {
   'Plankton': { points: 10, meters: 100, emoji: '🫧' },
@@ -42,16 +42,14 @@ Evaluate the player's answer for the given prompt and rank it on the Krillian ra
 Prompt: "${prompt}"
 Player's Answer: "${answer.trim()}"
 
-First, verify if the answer is factually correct and fits the prompt (forgive minor spelling typos if the intended answer is unmistakable).
-If it is factually incorrect, nonsensical, or does not fit the category, classify it as "Invalid".
-
-If valid, classify it into EXACTLY ONE of the 6 Krillian Rarity Scales based on how many people would think of this answer:
-1. "Plankton" (10 pts / 100m): The most obvious, immediate first-thought answers (>35% of players say this).
-2. "Too Clever" (15 pts / 150m): The classic overthinker collision trap! An answer that sounds smart, ironic, or like a textbook trivia fact that thousands of players reach for when trying to be clever (e.g., saying "Tomato" for a fruit, "Axolotl" for an X animal, or "Nepal" for a unique flag).
-3. "Schooler" (30 pts / 300m): Solid, respectable mid-tier pick (15-35% of players). Not the #1 obvious answer, but well-known.
-4. "Rare" (60 pts / 600m): Uncommon, strong pick (5-15% of players). Requires genuine thought.
-5. "Deep Cut" (85 pts / 850m): Genuinely obscure (1-5% of players). Deep knowledge that few people pull under time pressure.
-6. "One in a Krillian" (100 pts / 1000m): Legendary rarity (<1% of players). A factually correct answer that almost nobody else would ever think to type!`;
+First, verify if the answer is factually correct and fits the prompt. If incorrect or nonsensical, classify as "Invalid".
+If valid, classify into EXACTLY ONE of these 6 tiers:
+1. "Plankton" (10 pts / 100m): Obvious first-thought (>35% players).
+2. "Too Clever" (15 pts / 150m): Overthinker collision trap.
+3. "Schooler" (30 pts / 300m): Solid mid-tier pick (15-35%).
+4. "Rare" (60 pts / 600m): Uncommon pick (5-15%).
+5. "Deep Cut" (85 pts / 850m): Genuinely obscure (1-5%).
+6. "One in a Krillian" (100 pts / 1000m): Legendary rarity (<1%).`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
@@ -60,15 +58,12 @@ If valid, classify it into EXACTLY ONE of the 6 Krillian Rarity Scales based on 
         temperature: 0.3,
         responseMimeType: 'application/json',
         responseSchema: {
-          type: Type.OBJECT,
+          type: 'OBJECT',
           properties: {
-            valid: { type: Type.BOOLEAN },
-            normalizedAnswer: {
-              type: Type.STRING,
-              description: 'Properly capitalized and spelled version of the player answer'
-            },
+            valid: { type: 'BOOLEAN' },
+            normalizedAnswer: { type: 'STRING' },
             tier: {
-              type: Type.STRING,
+              type: 'STRING',
               enum: [
                 'Plankton',
                 'Too Clever',
@@ -79,14 +74,8 @@ If valid, classify it into EXACTLY ONE of the 6 Krillian Rarity Scales based on 
                 'Invalid'
               ]
             },
-            wittyComment: {
-              type: Type.STRING,
-              description: '1-2 witty ocean/diving themed sentences explaining why this answer landed in this specific tier.'
-            },
-            exampleOneInAKrillian: {
-              type: Type.STRING,
-              description: 'One example of what a true "One in a Krillian" answer for this prompt would have been.'
-            }
+            wittyComment: { type: 'STRING' },
+            exampleOneInAKrillian: { type: 'STRING' }
           },
           required: ['valid', 'normalizedAnswer', 'tier', 'wittyComment', 'exampleOneInAKrillian']
         }
