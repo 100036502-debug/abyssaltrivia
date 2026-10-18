@@ -27,8 +27,8 @@ export default async function handler(req, res) {
 per prompt and score more for rarer (but still valid) answers. The obvious
 answer earns almost nothing; deep, obscure, correct answers earn the most.
 
-WHAT MAKES A GOOD PROMPT
-- Open-ended: it has a large pool of valid answers (aim for 50-300), so
+MAKE A GOOD PROMPT
+- Open-ended: it has a large pool of valid answers MUST BE 50-300, so
   there is a clear "everyone says this" answer AND a long tail of obscure
   ones.
 - Objectively checkable: whether an answer is valid is a matter of fact,
