@@ -22,7 +22,6 @@ const depthLines = document.getElementById('depth-lines');
 const subMarker = document.getElementById('sub-marker');
 const subDepthLabel = document.getElementById('sub-depth-label');
 
-// Screen Navigation Helper
 function showScreen(screen) {
   [screenLogin, screenLobby, screenGame, screenSummary, screenIntro].forEach((s) => {
     if (s) s.classList.add('hidden');
@@ -30,7 +29,6 @@ function showScreen(screen) {
   if (screen) screen.classList.remove('hidden');
 }
 
-// Bubble Generator
 function createBubbles() {
   const container = document.getElementById('bubbles-container');
   if (!container) return;
@@ -49,7 +47,6 @@ function createBubbles() {
 }
 createBubbles();
 
-// PWA Install Prompt Handler
 let deferredPrompt = null;
 const installBtn = document.getElementById('install-pwa-btn');
 
@@ -72,17 +69,14 @@ if (installBtn) {
   });
 }
 
-// Register Service Worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
 
-// Auto-unlock if password already verified in this browser session
 if (userPassword) {
   showScreen(screenLobby);
 }
 
-// 1. Password Verification
 const loginForm = document.getElementById('login-form');
 if (loginForm) {
   loginForm.addEventListener('submit', async (e) => {
@@ -121,7 +115,6 @@ if (loginForm) {
   });
 }
 
-// 2. Start New Dive + Fullscreen Submarine Intro
 document.getElementById('start-dive-btn').addEventListener('click', startNewDive);
 document.getElementById('play-again-btn').addEventListener('click', startNewDive);
 
@@ -143,8 +136,6 @@ async function startNewDive() {
     if (!res.ok) throw new Error(data.error || 'Failed to start dive');
 
     prompts = data.prompts;
-
-    // Save prompts permanently in localStorage so they never repeat across sessions
     previousPrompts.push(...prompts);
     if (previousPrompts.length > 500) {
       previousPrompts = previousPrompts.slice(-500);
@@ -156,7 +147,6 @@ async function startNewDive() {
     totalDepth = 0;
     diveHistory = [];
 
-    // Show full-screen submarine descending animation first, then open board
     hudStats.classList.add('hidden');
     depthSidebar.classList.add('hidden');
     showScreen(screenIntro);
@@ -177,7 +167,6 @@ async function startNewDive() {
   }
 }
 
-// 3. Load Active Round & Start Oxygen Timer
 function loadRound() {
   document.getElementById('hud-round').textContent = `${currentRound + 1}/7`;
   document.getElementById('prompt-text').textContent = prompts[currentRound];
@@ -208,7 +197,7 @@ function startTimer() {
   timerBar.style.width = '100%';
 
   timerInterval = setInterval(() => {
-    if (isScanning) return; // Pauses oxygen countdown while AI is scanning sonar
+    if (isScanning) return;
 
     timeLeft--;
     timerCount.textContent = Math.max(timeLeft, 0);
@@ -221,7 +210,6 @@ function startTimer() {
   }, 1000);
 }
 
-// Handle 0s Oxygen Expiration
 function handleTimeout() {
   isScanning = false;
   const input = document.getElementById('answer-input');
@@ -252,14 +240,12 @@ function handleTimeout() {
   document.getElementById('result-points').textContent = '0';
   document.getElementById('result-meters').textContent = '0';
   document.getElementById('result-comment').textContent = 'You ran out of oxygen before locking in a valid answer! You remain at your current depth.';
-  document.getElementById('result-example').textContent = 'Keep an eye on the O₂ gauge!';
 
   const nextBtn = document.getElementById('next-prompt-btn');
   nextBtn.textContent = currentRound < 6 ? 'Next Depth Prompt ➡️' : 'Surface & View Final Score ⚓';
   resultBox.classList.remove('hidden');
 }
 
-// 4. Submit Answer (Pauses timer during scan; resumes without resetting on invalid answer)
 document.getElementById('answer-form').addEventListener('submit', (e) => {
   e.preventDefault();
   const answer = document.getElementById('answer-input').value.trim();
@@ -272,7 +258,7 @@ async function submitAnswer(answer) {
   const submitBtn = document.getElementById('submit-answer-btn');
   const feedbackEl = document.getElementById('answer-feedback');
 
-  isScanning = true; // Pause O2 timer while scanning
+  isScanning = true;
   input.disabled = true;
   submitBtn.disabled = true;
   submitBtn.textContent = 'Scanning Sonar... (O₂ Paused)';
@@ -294,7 +280,6 @@ async function submitAnswer(answer) {
 
     if (timeLeft <= 0) return;
 
-    // Invalid answer: resume timer from where it paused and let user keep guessing
     if (!data.valid || data.tier === 'Invalid') {
       isScanning = false;
       input.disabled = false;
@@ -307,7 +292,6 @@ async function submitAnswer(answer) {
       return;
     }
 
-    // Valid answer locked in: stop timer and descend!
     clearInterval(timerInterval);
     isScanning = false;
 
@@ -335,12 +319,11 @@ async function submitAnswer(answer) {
     const badge = document.getElementById('tier-badge');
     badge.textContent = `${data.emoji} ${data.tier.toUpperCase()}`;
     badge.style.background = getTierColor(data.tier);
-    badge.style.color = data.tier === 'One in a Krillian' ? '#020617' : '#fff';
+    badge.style.color = data.tier === 'One in a Krillion' ? '#020617' : '#fff';
 
     document.getElementById('result-points').textContent = data.points;
     document.getElementById('result-meters').textContent = data.meters;
     document.getElementById('result-comment').textContent = data.wittyComment;
-    document.getElementById('result-example').textContent = data.exampleOneInAKrillian;
 
     const nextBtn = document.getElementById('next-prompt-btn');
     nextBtn.textContent = currentRound < 6 ? 'Next Depth Prompt ➡️' : 'Surface & View Final Score ⚓';
@@ -356,7 +339,6 @@ async function submitAnswer(answer) {
   }
 }
 
-// 5. Dive Animation & Depth Visuals
 function triggerDiveAnimation(fromDepth, toDepth) {
   const duration = 1200;
   const startTime = performance.now();
@@ -411,12 +393,11 @@ function getTierColor(tier) {
     case 'Schooler': return '#0284c7';
     case 'Rare': return '#9333ea';
     case 'Deep Cut': return '#db2777';
-    case 'One in a Krillian': return '#fbbf24';
+    case 'One in a Krillion': return '#fbbf24';
     default: return '#1e293b';
   }
 }
 
-// 6. Next Round or Final Summary
 document.getElementById('next-prompt-btn').addEventListener('click', () => {
   currentRound++;
   if (currentRound < 7) {
