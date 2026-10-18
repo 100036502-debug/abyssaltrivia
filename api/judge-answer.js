@@ -21,6 +21,10 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized: Invalid password.' });
   }
 
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(500).json({ error: 'Server configuration error: GEMINI_API_KEY is missing.' });
+  }
+
   if (!answer || !answer.trim()) {
     return res.status(200).json({
       valid: false,
@@ -82,6 +86,10 @@ If valid, classify into EXACTLY ONE of these 6 tiers:
       }
     });
 
+    if (!response || !response.text) {
+      throw new Error('Empty evaluation response from Google AI Studio.');
+    }
+
     const result = JSON.parse(response.text);
     const tierStats = TIER_MAP[result.tier] || TIER_MAP['Invalid'];
 
@@ -92,7 +100,7 @@ If valid, classify into EXACTLY ONE of these 6 tiers:
       emoji: tierStats.emoji
     });
   } catch (error) {
-    console.error('Gemini judge-answer error:', error);
-    return res.status(500).json({ error: 'Failed to judge answer.' });
+    console.error('Gemini judge-answer critical error:', error);
+    return res.status(500).json({ error: `AI Judgment Error: ${error.message}` });
   }
 }
