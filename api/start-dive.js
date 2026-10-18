@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from '@google/genai';
+import { GoogleGenAI } from '@google/genai';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     const systemPrompt = `You are the game designer for "Krillian Unlimited", a reverse-Pointless style deep-sea word game.
 Generate 7 creative, open-ended category prompts for a new dive.
 Rules for prompts:
-1. Each prompt must have at least 30+ possible factual or universally verifiable answers (e.g., "Name a country with red on its flag", "Name a mammal that lives in the ocean", "Name an element on the periodic table that starts with C", "Name a movie directed by Steven Spielberg", "Name a culinary herb").
+1. Each prompt must have at least 30+ possible factual or universally verifiable answers.
 2. Vary the topics across geography, science, animals, food, language, pop culture, and history.
 3. Keep prompts concise and punchy (under 12 words).
 4. Avoid repeating any of these recent prompts: ${previousPrompts.slice(-21).join('; ')}`;
@@ -33,11 +33,11 @@ Rules for prompts:
         temperature: 1.0,
         responseMimeType: 'application/json',
         responseSchema: {
-          type: Type.OBJECT,
+          type: 'OBJECT',
           properties: {
             prompts: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING },
+              type: 'ARRAY',
+              items: { type: 'STRING' },
               description: 'List of exactly 7 category prompts for the dive.'
             }
           },
