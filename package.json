@@ -1,0 +1,12 @@
+{
+  "name": "krillian-unlimited",
+  "version": "1.0.0",
+  "description": "An endless AI-powered deep-sea rarity word game inspired by Krillian.io",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@google/genai": "^0.1.2"
+  }
+}
