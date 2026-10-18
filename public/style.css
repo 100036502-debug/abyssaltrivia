@@ -50,11 +50,11 @@ body {
   100% { transform: translateY(-115vh) scale(1.4); opacity: 0; }
 }
 
-/* Cinematic Fullscreen Submarine Intro */
+/* Cinematic Fullscreen Submarine Intro with Sea Decor & Landing Markers */
 .fullscreen-intro {
   position: fixed;
   inset: 0;
-  background: #020617;
+  background: radial-gradient(circle at center, #0c4a6e 0%, #020617 80%);
   z-index: 100;
   display: flex;
   flex-direction: column;
@@ -65,9 +65,9 @@ body {
 }
 .sub-animation-stage {
   position: relative;
-  height: 220px;
+  height: 200px;
   width: 100px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 .large-sub {
   font-size: 4rem;
@@ -90,14 +90,53 @@ body {
 }
 @keyframes subDescentAnim {
   0% { top: 0px; transform: translateX(-50%) scale(0.8); }
-  100% { top: 150px; transform: translateX(-50%) scale(1.2); }
+  100% { top: 130px; transform: translateX(-50%) scale(1.2); }
 }
 @keyframes beamGrowAnim {
   0% { height: 0px; }
-  100% { height: 120px; }
+  100% { height: 110px; }
 }
-.cinematic-title { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; margin-bottom: 8px; color: #38bdf8; }
-.cinematic-subtitle { color: var(--text-muted); font-size: 1rem; }
+
+.intro-side-decor {
+  position: absolute;
+  top: 25%;
+  font-size: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  animation: decorFloat 3s ease-in-out infinite alternate;
+  opacity: 0.8;
+}
+.left-decor { left: 8%; }
+.right-decor { right: 8%; }
+@keyframes decorFloat {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(12px); }
+}
+
+.cinematic-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; margin-bottom: 6px; color: #38bdf8; }
+.cinematic-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; }
+
+.intro-landing-milestones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: 500px;
+}
+.milestone-badge {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--card-border);
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: #38bdf8;
+  animation: fadeInMilestone 1.5s ease;
+}
+@keyframes fadeInMilestone {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
 
 /* Sidebar & Layout */
 .depth-sidebar { position: fixed; left: 24px; top: 10%; bottom: 10%; width: 95px; z-index: 10; }
