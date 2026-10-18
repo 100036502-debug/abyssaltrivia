@@ -6,7 +6,7 @@ let totalScore = 0;
 let totalDepth = 0;
 let diveHistory = [];
 let timerInterval = null;
-let timeLeft = 25;\
+let timeLeft = 25;
 let isScanning = false;
 
 // DOM Elements
@@ -30,7 +30,7 @@ function showScreen(screen) {
   if (screen) screen.classList.remove('hidden');
 }
 
-// Bubble Generator (Fixed syntax)
+// Bubble Generator
 function createBubbles() {
   const container = document.getElementById('bubbles-container');
   if (!container) return;
@@ -72,7 +72,7 @@ if (installBtn) {
   });
 }
 
-// Register Service Worker (network-first so updates never get stuck in cache)
+// Register Service Worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
@@ -83,40 +83,43 @@ if (userPassword) {
 }
 
 // 1. Password Verification
-document.getElementById('login-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const pwInput = document.getElementById('password-input').value.trim();
-  const loginBtn = document.getElementById('login-btn');
-  const errorEl = document.getElementById('login-error');
+const loginForm = document.getElementById('login-form');
+if (loginForm) {
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pwInput = document.getElementById('password-input').value.trim();
+    const loginBtn = document.getElementById('login-btn');
+    const errorEl = document.getElementById('login-error');
 
-  loginBtn.disabled = true;
-  loginBtn.textContent = 'Verifying Sonar Key...';
-  errorEl.classList.add('hidden');
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Verifying Sonar Key...';
+    errorEl.classList.add('hidden');
 
-  try {
-    const res = await fetch('/api/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pwInput })
-    });
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pwInput })
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (res.ok && data.authenticated) {
-      userPassword = pwInput;
-      sessionStorage.setItem('abyssal_pw', userPassword);
-      showScreen(screenLobby);
-    } else {
-      throw new Error(data.error || 'Invalid password authorization.');
+      if (res.ok && data.authenticated) {
+        userPassword = pwInput;
+        sessionStorage.setItem('abyssal_pw', userPassword);
+        showScreen(screenLobby);
+      } else {
+        throw new Error(data.error || 'Invalid password authorization.');
+      }
+    } catch (err) {
+      errorEl.textContent = err.message;
+      errorEl.classList.remove('hidden');
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Unlock Submersible';
     }
-  } catch (err) {
-    errorEl.textContent = err.message;
-    errorEl.classList.remove('hidden');
-  } finally {
-    loginBtn.disabled = false;
-    loginBtn.textContent = 'Unlock Submersible';
-  }
-});
+  });
+}
 
 // 2. Start New Dive + Fullscreen Submarine Intro
 document.getElementById('start-dive-btn').addEventListener('click', startNewDive);
@@ -190,7 +193,7 @@ function loadRound() {
 function startTimer() {
   clearInterval(timerInterval);
   timeLeft = 25;
-  isScanning = false; // <-- Ensure timer starts unpaused
+  isScanning = false;
   const timerCount = document.getElementById('timer-count');
   const timerBar = document.getElementById('timer-bar');
 
@@ -198,7 +201,7 @@ function startTimer() {
   timerBar.style.width = '100%';
 
   timerInterval = setInterval(() => {
-    if (isScanning) return; // <-- PAUSES TIMER WHILE SCANNING SONAR!
+    if (isScanning) return; // Pauses oxygen countdown while AI is scanning sonar
 
     timeLeft--;
     timerCount.textContent = Math.max(timeLeft, 0);
@@ -211,9 +214,9 @@ function startTimer() {
   }, 1000);
 }
 
-
 // Handle 0s Oxygen Expiration
 function handleTimeout() {
+  isScanning = false;
   const input = document.getElementById('answer-input');
   const submitBtn = document.getElementById('submit-answer-btn');
   const feedbackEl = document.getElementById('answer-feedback');
@@ -249,7 +252,7 @@ function handleTimeout() {
   resultBox.classList.remove('hidden');
 }
 
-// 4. Submit Answer (Allows unlimited retries on invalid answers while timer keeps ticking)
+// 4. Submit Answer (Pauses timer during scan; resumes without resetting on invalid answer)
 document.getElementById('answer-form').addEventListener('submit', (e) => {
   e.preventDefault();
   const answer = document.getElementById('answer-input').value.trim();
@@ -262,7 +265,7 @@ async function submitAnswer(answer) {
   const submitBtn = document.getElementById('submit-answer-btn');
   const feedbackEl = document.getElementById('answer-feedback');
 
-  isScanning = true; // <-- 1. PAUSE TIMER HERE (Around Line 232)
+  isScanning = true; // Pause O2 timer while scanning
   input.disabled = true;
   submitBtn.disabled = true;
   submitBtn.textContent = 'Scanning Sonar... (O₂ Paused)';
@@ -284,9 +287,9 @@ async function submitAnswer(answer) {
 
     if (timeLeft <= 0) return;
 
-    // Invalid answer: unpause timer and let user keep guessing!
+    // Invalid answer: resume timer from where it paused and let user keep guessing
     if (!data.valid || data.tier === 'Invalid') {
-      isScanning = false; // <-- 2. RESUME TIMER HERE (Around Line 255)
+      isScanning = false;
       input.disabled = false;
       submitBtn.disabled = false;
       submitBtn.textContent = 'Submit Answer ⬇️';
@@ -297,7 +300,7 @@ async function submitAnswer(answer) {
       return;
     }
 
-    // Valid answer locked in: stop timer completely for this round
+    // Valid answer locked in: stop timer and descend!
     clearInterval(timerInterval);
     isScanning = false;
 
@@ -336,7 +339,7 @@ async function submitAnswer(answer) {
     nextBtn.textContent = currentRound < 6 ? 'Next Depth Prompt ➡️' : 'Surface & View Final Score ⚓';
     resultBox.classList.remove('hidden');
   } catch (err) {
-    isScanning = false; // <-- 3. RESUME TIMER IF NETWORK ERROR OCCURS (Around Line 302)
+    isScanning = false;
     alert(err.message);
     if (timeLeft > 0) {
       input.disabled = false;
