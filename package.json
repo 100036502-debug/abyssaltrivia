@@ -1,7 +1,7 @@
 {
-  "name": "krillian-unlimited",
+  "name": "abyssal-trivia",
   "version": "1.0.0",
-  "description": "An endless AI-powered deep-sea rarity word game inspired by Krillian.io",
+  "description": "An endless AI-powered deep-sea rarity word game",
   "type": "module",
   "scripts": {
     "dev": "vercel dev"
