@@ -31,7 +31,7 @@ export default async function handler(req, res) {
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-3.5-flash-lite',
       contents: `Evaluate player answer for Abyssal Trivia. Prompt: "${prompt}" | Answer: "${answer.trim()}"
 If incorrect, nonsensical, or off-topic, set "valid": false and tier "Invalid".
 If valid, classify into ONE tier: "Plankton" (obvious), "Too Clever" (overthinker trap), "Schooler" (solid), "Rare" (uncommon), "Deep Cut" (obscure), "One in a Krillian" (legendary rarity).`,
