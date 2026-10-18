@@ -1,8 +1,18 @@
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const { password } = req.body;
-  if (password === process.env.GAME_PASSWORD) {
-    return res.status(200).json({ authenticated: true });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
-  return res.status(401).json({ error: 'Invalid dive authorization code.' });
+
+  const { password } = req.body;
+  const serverPassword = process.env.GAME_PASSWORD;
+
+  if (!serverPassword) {
+    return res.status(500).json({ error: 'Server configuration error: GAME_PASSWORD is not set in Vercel.' });
+  }
+
+  if (password === serverPassword) {
+    return res.status(200).json({ authenticated: true });
+  } else {
+    return res.status(401).json({ error: 'Invalid dive authorization code.' });
+  }
 }
