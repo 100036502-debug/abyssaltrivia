@@ -56,7 +56,7 @@ If valid, classify into EXACTLY ONE of these 6 tiers:
 6. "One in a Krillian" (100 pts / 1000m): Legendary rarity (<1%).`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.8-flash',
       contents: judgePrompt,
       config: {
         temperature: 0.3,
