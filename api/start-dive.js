@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-3.5-flash-lite',
       contents: `You are the game designer for "Abyssal Trivia", a deep-sea rarity word game. Generate 7 open-ended category prompts (each with 30+ factual answers) across science, geography, pop-culture, and nature. Avoid: ${previousPrompts.slice(-21).join('; ')}`,
       config: {
         temperature: 1.0,
